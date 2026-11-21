@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Animated Weather Card – demo</title>
+<style>
+  body{margin:0;background:#10151c;color:#dfe6ee;font:14px/1.4 system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px}
+  #bar{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:640px}
+  #bar button{border:1px solid #33404f;background:#1a222c;color:#dfe6ee;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit}
+  #bar button.on{background:#2a6ab3;border-color:#2a6ab3;color:#fff}
+  #host{width:min(100%,520px)}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="host"></div>
+<script src="../dist/ha-animated-weather-card.js"></script>
+<script>
+// Standalone preview: no Home Assistant needed. The card runs in demo mode with built-in sample data.
+// URL: demo/index.html?demo=rain&locale=en     (demo = rain|pouring|snow|storm|fog|clear|night|cloudy|partly|windy|hail|sleet, add -night for night)
+const q = new URLSearchParams(location.search);
+const states = ['clear', 'night', 'partly', 'cloudy', 'rain', 'pouring', 'storm', 'snow', 'fog', 'windy'];
+const cur = q.get('demo') || 'clear';
+const bar = document.getElementById('bar');
+states.forEach((s) => { const b = document.createElement('button'); b.textContent = s; if (s === cur) b.className = 'on'; b.onclick = () => { q.set('demo', s); location.search = q.toString(); }; bar.appendChild(b); });
+if (q.has('bare')) bar.style.display = 'none';
+const card = document.createElement('ha-animated-weather-card');
+card.setConfig({ weather_entity: 'weather.demo', name: q.get('name') || 'Demo city', locale: q.get('locale') || 'en', demo: cur, footer: 'Demo data', height: q.get('h') || null });
+card.hass = { states: {}, locale: { language: 'en' }, callWS: async () => ({}) };
+document.getElementById('host').appendChild(card);
+</script>
+</body>
+</html>
